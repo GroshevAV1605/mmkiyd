@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { objects, data } from "../../constants";
-import { Table, Button } from "react-bootstrap";
+import { Table, Button, Modal } from "react-bootstrap";
 
 const AccessModel = ({ username }) => {
 
@@ -60,10 +60,30 @@ const AccessAdminPanel = () => {
 };
 
 const AccessUserPanel = ({username}) => {
+  const [show, setShow] = useState(false);
+
+
+  const buttonOnClick = (e) => {
+    setShow(true);
+  }
+
   return(
-    <div>
-      {objects.map(obj => <Button variant="secondary" size="lg" block>{obj.name}</Button>)}
-    </div>
+    <React.Fragment>
+      <div>
+        {objects.map((obj, i) => <Button variant="secondary" size="lg" block key={i} onClick={buttonOnClick}>{obj.name}</Button>)}
+      </div>
+      <Modal show={show} onHide={()=>setShow(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Фыв йцу</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Info</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={()=>setShow(false)}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </React.Fragment>
   );
 };
 
