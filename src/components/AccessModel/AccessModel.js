@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { objects, data } from "../../constants";
-import { Table, Button, Modal } from "react-bootstrap";
+import { Table, Button, Modal, ButtonGroup } from "react-bootstrap";
 
 const AccessModel = ({ username }) => {
 
@@ -61,22 +61,32 @@ const AccessAdminPanel = () => {
 
 const AccessUserPanel = ({username}) => {
   const [show, setShow] = useState(false);
+  const [displayData, displayDataHandler] = useState('')
+  const users = data.map(user => user.username).filter(user=>user!="admin");
 
-
-  const buttonOnClick = (e) => {
+  const OpenModal = (objIndex, right) => {
+    console.log(`index: ${objIndex}  /  right: ${right}`);
+    const deleg = objects[objIndex].rights[users.indexOf(username)].includes(right);
+    let dataType = `Пользователь \"${username}\" запрашивает разрешение на ${right=='r' ? 'чтение' : right == 'w' ? 'запись' : 'выполнение'} объекта \"${objects[objIndex].name}\".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
+    displayDataHandler(dataType);
     setShow(true);
+
   }
 
   return(
     <React.Fragment>
       <div>
-        {objects.map((obj, i) => <Button variant="secondary" size="lg" block key={i} onClick={buttonOnClick}>{obj.name}</Button>)}
+        {objects.map((obj, i) => <ObjectButton key={i} objIndex={i} OpenModal={OpenModal} obj={obj} />)}
       </div>
+      {/*<div>
+        {objects.map((obj, i) => <Button variant="secondary" size="lg" block key={i} onClick={buttonOnClick}>{obj.name}</Button>)}
+
+      </div>*/}
       <Modal show={show} onHide={()=>setShow(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Фыв йцу</Modal.Title>
+          <Modal.Title>Title</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Info</Modal.Body>
+        <Modal.Body>{displayData}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={()=>setShow(false)}>
             OK
@@ -86,5 +96,23 @@ const AccessUserPanel = ({username}) => {
     </React.Fragment>
   );
 };
+
+const ObjectButton = ({obj, objIndex, OpenModal}) => {
+  const [showSub, showSubHandle] = useState(false);
+
+  const onBtnClick = (e) => {
+    OpenModal(objIndex, e.target.value);
+  }
+  return(
+    <div>
+      <Button className="object_btn" variant="secondary" size="lg" block onClick={()=>showSubHandle(!showSub)}>{obj.name}</Button>
+      {showSub &&<ButtonGroup>
+        <Button variant="primary" value = "r" onClick={onBtnClick}>Read</Button>
+        <Button variant="primary" value = "w" onClick={onBtnClick}>Write</Button>
+        <Button variant="primary" value = "e" onClick={onBtnClick}>Execute</Button>
+      </ButtonGroup>}
+    </div>
+  )
+}
 
 export default AccessModel;
