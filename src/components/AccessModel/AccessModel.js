@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { objects, data } from "../../constants";
+import React, { useState } from "react";
+import { objects, data } from "../../constants/AMconstants";
 import { Table, Button, Modal, ButtonGroup } from "react-bootstrap";
 
 const AccessModel = ({ username }) => {
@@ -67,8 +67,8 @@ const AccessUserPanel = ({username}) => {
   const OpenModal = (objIndex, right) => {
     console.log(`index: ${objIndex}  /  right: ${right}`);
     const deleg = objects[objIndex].rights[users.indexOf(username)].includes(right);
-    let dataType = `Пользователь \"${username}\" запрашивает разрешение на ${right=='r' ? 'чтение' : right == 'w' ? 'запись' : 'выполнение'} объекта \"${objects[objIndex].name}\".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
-    displayDataHandler(dataType);
+    let dataString = `Пользователь \"${username}\" запрашивает разрешение на ${right=='r' ? 'чтение' : right == 'w' ? 'запись' : 'выполнение'} объекта \"${objects[objIndex].name}\".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
+    displayDataHandler(dataString);
     setShow(true);
 
   }
