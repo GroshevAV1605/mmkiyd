@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import { data } from "../../constants/AMconstants";
 
-const LoginForm = ({ isLoginChange, usernameChange }) => {
+const LoginForm = ({ isLoginChange, usernameChange, UsersData }) => {
   const [loginData, loginDataChange] = useState({
     username: "",
     password: ""
@@ -16,7 +15,7 @@ const LoginForm = ({ isLoginChange, usernameChange }) => {
   const LogInHandler = e => {
     e.preventDefault();
     if (
-      data.some(
+      UsersData.some(
         cred =>
           cred.username === loginData.username &&
           cred.password === loginData.password

@@ -6,3 +6,13 @@ body {
 .object_btn{
   margin-top: 12px;
 }
+
+.input_group{
+  margin-top: 40px;
+}
+
+.error_label{
+  color: red;
+  font-size: 14px;
+  margin-left: 12px;
+}

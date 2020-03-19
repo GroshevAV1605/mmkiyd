@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { objects, data } from "../../constants/AMconstants";
+import { objects } from "../../constants/AMconstants";
 import { Table, Button, Modal, ButtonGroup } from "react-bootstrap";
 
-const AccessModel = ({ username }) => {
+const AccessModel = ({ username, UsersData }) => {
 
-  return username=="admin" ? (
-    <AccessAdminPanel/>
+  return username==="admin" ? (
+    <AccessAdminPanel UsersData={UsersData}/>
   ) : (
-    <AccessUserPanel username={username}/>
+    <AccessUserPanel username={username} UsersData={UsersData}/>
   );
 };
 
-const AccessAdminPanel = () => {
+const AccessAdminPanel = ({UsersData}) => {
   const [rights, rightHandle] = useState(objects.map(el=>el.rights));
 
   const rightsOnChange = e => {
@@ -34,7 +34,7 @@ const AccessAdminPanel = () => {
       <thead>
         <tr>
           <th>#</th>
-          {data.map((el, i) => (
+          {UsersData.map((el, i) => (
             <th key={i}>{el.username}</th>
           ))}
         </tr>
@@ -59,15 +59,15 @@ const AccessAdminPanel = () => {
   );
 };
 
-const AccessUserPanel = ({username}) => {
+const AccessUserPanel = ({username, UsersData}) => {
   const [show, setShow] = useState(false);
   const [displayData, displayDataHandler] = useState('')
-  const users = data.map(user => user.username).filter(user=>user!="admin");
+  const users = UsersData.map(user => user.username).filter(user=>user!=="admin");
 
   const OpenModal = (objIndex, right) => {
     console.log(`index: ${objIndex}  /  right: ${right}`);
     const deleg = objects[objIndex].rights[users.indexOf(username)].includes(right);
-    let dataString = `Пользователь \"${username}\" запрашивает разрешение на ${right=='r' ? 'чтение' : right == 'w' ? 'запись' : 'выполнение'} объекта \"${objects[objIndex].name}\".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
+    let dataString = `Пользователь "${username}" запрашивает разрешение на ${right==='r' ? 'чтение' : right === 'w' ? 'запись' : 'выполнение'} объекта "${objects[objIndex].name}".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
     displayDataHandler(dataString);
     setShow(true);
 
@@ -107,9 +107,9 @@ const ObjectButton = ({obj, objIndex, OpenModal}) => {
     <div>
       <Button className="object_btn" variant="secondary" size="lg" block onClick={()=>showSubHandle(!showSub)}>{obj.name}</Button>
       {showSub &&<ButtonGroup>
-        <Button variant="primary" value = "r" onClick={onBtnClick}>Read</Button>
-        <Button variant="primary" value = "w" onClick={onBtnClick}>Write</Button>
-        <Button variant="primary" value = "e" onClick={onBtnClick}>Execute</Button>
+        <Button variant="primary" value="r" onClick={onBtnClick}>Read</Button>
+        <Button variant="primary" value="w" onClick={onBtnClick}>Write</Button>
+        <Button variant="primary" value="e" onClick={onBtnClick}>Execute</Button>
       </ButtonGroup>}
     </div>
   )
