@@ -51,23 +51,73 @@ const HRUUserPanel = ({username, UsersData}) => {
     setShow(true);
   }
 
-  const addSub = () =>{
-    console.log('addSub');   
+  const addSub = (pars) =>{
+    
+    if(pars.length !== 2){
+      setError('Ошибка команды:  addSub <Имя субъекта>');
+      return
+    }
+    let name = pars[1];
+    console.log('addSub ' + name);
+
+    if(UsersData.some(user=> user.username===name)){
+      setError(`Субъект с именем "${name}" уже сущсетвует`)
+      return;
+    }
+
+    UsersData.push({username: name, password: "123"});
+    objects.forEach(obj=>{
+      obj.rights.push("");
+    });
+    console.log(objects);
   }
 
-  const delSub = () =>{
-    console.log('delSub');
+  const delSub = (pars) =>{
+    if(pars.length !== 2){
+      setError('Ошибка команды:  delSub <Имя субъекта>');
+      return
+    }
+    let name = pars[1];
+    console.log('delSub ' + name);
+
+    if(!UsersData.some(user=> user.username===name)){
+      setError(`Субъекта с именем "${name}" не сущсетвует`)
+      return;
+    }
+    let indexDel = UsersData.map(user=>user.username).indexOf(name);
+    UsersData.splice(indexDel, 1);
+    objects.forEach(obj=>{
+      obj.rights.splice(indexDel, 1);
+    })
   }
 
-  const addObj = () =>{
-    console.log('addObj');
+  const addObj = (pars) =>{
+    if (pars.length !== 2){
+      setError('Ошибка команды:  addObj <Имя объекта>')
+    }
+    let name = pars[1];
+    console.log('addObj ' + name);
+    if(objects.some(obj=> obj.name===name)){
+      setError(`Объект с названием ${name} уже сущсетвует`)
+      return;
+    }
+    /*objects.push({
+      name,
+      rights: UsersData.map(user=> user.username==username? "orwe" : )
+    })*/
+
+    //!!!!!!!!!!!!!!!! ДОДЕЛАТЬ ПОСЛЕ addRight !!!!!!!!!!!!!!!!!
   }
 
   const delObj = () =>{
     console.log('delObj');
   }
 
-  const addRight = () =>{
+  const addRight = (pars) =>{
+    if(pars.length !== 4){
+      setError('Ошибка команды:  addRight <r,w,e> <Имя субъекта> <Имя объекта>')
+    }
+
     console.log('addRight');
   }
 
