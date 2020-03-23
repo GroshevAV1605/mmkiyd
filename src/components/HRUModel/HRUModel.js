@@ -1,16 +1,16 @@
 import React, {useState} from "react";
 import {Table, Modal, Button, ButtonGroup, InputGroup, FormControl} from 'react-bootstrap';
-import {objects} from '../../constants/HRUconstants';
 
-const HRUModel = ({ username, UsersData }) => {
+const HRUModel = ({ username, UsersData, ObjectsData, isLoginChange }) => {
   return username==="admin" ? (
-    <HRUAdminPanel UsersData={UsersData}/>
+    <HRUAdminPanel UsersData={UsersData} ObjectsData={ObjectsData}/>
   ) : (
-    <HRUUserPanel username={username} UsersData={UsersData}/>
+    <HRUUserPanel username={username} UsersData={UsersData} ObjectsData={ObjectsData} isLoginChange={isLoginChange}/>
   );
 };
 
-const HRUAdminPanel = ({UsersData}) => {
+const HRUAdminPanel = ({UsersData, ObjectsData}) => {
+  console.log(ObjectsData);
   
   return (
     <Table striped hover bordered>
@@ -21,7 +21,7 @@ const HRUAdminPanel = ({UsersData}) => {
         </tr>
       </thead>
       <tbody>
-        {objects.map((el, i)=>(
+        {ObjectsData.map((el, i)=>(
           <tr key={i}>
             <td>{el.name}</td>
             {el.rights.map((right, j) => (
@@ -36,7 +36,7 @@ const HRUAdminPanel = ({UsersData}) => {
   )
 }
 
-const HRUUserPanel = ({username, UsersData}) => {
+const HRUUserPanel = ({username, UsersData, ObjectsData, isLoginChange}) => {
   const [show, setShow] = useState(false);
   const [displayData, displayDataHandler] = useState('')
   const [command, setCommand] = useState('');
@@ -45,31 +45,10 @@ const HRUUserPanel = ({username, UsersData}) => {
 
   const OpenModal = (objIndex, right) => {
     console.log(`index: ${objIndex}  /  right: ${right}`);
-    const deleg = objects[objIndex].rights[users.indexOf(username)].includes(right);
-    let dataString = `Пользователь "${username}" запрашивает разрешение на ${right==='r' ? 'чтение' : right === 'w' ? 'запись' : 'выполнение'} объекта "${objects[objIndex].name}".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
+    const deleg = ObjectsData[objIndex].rights[users.indexOf(username)].includes(right);
+    let dataString = `Пользователь "${username}" запрашивает разрешение на ${right==='r' ? 'чтение' : right === 'w' ? 'запись' : 'выполнение'} объекта "${ObjectsData[objIndex].name}".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
     displayDataHandler(dataString);
     setShow(true);
-  }
-
-  const addSub = (pars) =>{
-    
-    if(pars.length !== 2){
-      setError('Ошибка команды:  addSub <Имя субъекта>');
-      return
-    }
-    let name = pars[1];
-    console.log('addSub ' + name);
-
-    if(UsersData.some(user=> user.username===name)){
-      setError(`Субъект с именем "${name}" уже сущсетвует`)
-      return;
-    }
-
-    UsersData.push({username: name, password: "123"});
-    objects.forEach(obj=>{
-      obj.rights.push("");
-    });
-    console.log(objects);
   }
 
   const delSub = (pars) =>{
@@ -80,15 +59,16 @@ const HRUUserPanel = ({username, UsersData}) => {
     let name = pars[1];
     console.log('delSub ' + name);
 
-    if(!UsersData.some(user=> user.username===name)){
-      setError(`Субъекта с именем "${name}" не сущсетвует`)
+    if(name!==username){
+      setError(`Нет прав на удаление пользователя "${name}"`)
       return;
     }
     let indexDel = UsersData.map(user=>user.username).indexOf(name);
     UsersData.splice(indexDel, 1);
-    objects.forEach(obj=>{
+    ObjectsData.forEach(obj=>{
       obj.rights.splice(indexDel, 1);
     })
+    isLoginChange(false);
   }
 
   const addObj = (pars) =>{
@@ -97,19 +77,35 @@ const HRUUserPanel = ({username, UsersData}) => {
     }
     let name = pars[1];
     console.log('addObj ' + name);
-    if(objects.some(obj=> obj.name===name)){
+    if(ObjectsData.some(obj=> obj.name===name)){
       setError(`Объект с названием ${name} уже сущсетвует`)
       return;
     }
-    /*objects.push({
+    ObjectsData.push({
       name,
-      rights: UsersData.map(user=> user.username==username? "orwe" : )
-    })*/
-
-    //!!!!!!!!!!!!!!!! ДОДЕЛАТЬ ПОСЛЕ addRight !!!!!!!!!!!!!!!!!
+      rights: UsersData.map(user=> user.username===username? "orwe" : "")
+    })
   }
 
-  const delObj = () =>{
+  const delObj = (pars) =>{
+    if (pars.length !== 2){
+      setError('Ошибка команды:  addObj <Имя объекта>')
+    }
+    let name = pars[1];
+    console.log('addObj ' + name);
+    if(!ObjectsData.some(obj=> obj.name===name)){
+      setError(`Объекта с названием ${name} не сущсетвует`)
+      return;
+    }
+    let objIndex = ObjectsData.map(obj=> obj.name).indexOf(name);
+    let curSubIndex = UsersData.map(usr=>usr.username).indexOf(username);
+    if(!ObjectsData[objIndex].rights[curSubIndex].includes('o')){
+      setError(`Нет прав на удаление объекта "${name}"`);
+      return;
+    }
+
+    ObjectsData.splice(objIndex, 1);
+
     console.log('delObj');
   }
 
@@ -117,11 +113,59 @@ const HRUUserPanel = ({username, UsersData}) => {
     if(pars.length !== 4){
       setError('Ошибка команды:  addRight <r,w,e> <Имя субъекта> <Имя объекта>')
     }
+    let [right, subName, objName] = [pars[1], pars[2], pars[3]];
+    if(!right.match(/^r?w?e?$/)){
+      setError('Некорректные права доступа (rwe)');
+      return;
+    }
+    if(!UsersData.some(user=> user.username===subName)){
+      setError(`Пользователя "${subName}" не существует`);
+      return;
+    }
+    if(!ObjectsData.some(obj=> obj.name === objName)){
+      setError(`Объекта "${objName}" не существует`);
+      return;
+    }
+    let objIndex = ObjectsData.map(obj=>obj.name).indexOf(objName);
+    let curSubIndex = UsersData.map(usr=>usr.username).indexOf(username);
+    let subIndex = UsersData.map(usr=>usr.username).indexOf(subName);
+    if(!ObjectsData[objIndex].rights[curSubIndex].includes('o')){
+      setError(`Вы не можете изменять права на объект "${objName}" `);
+      return;
+    }
+    let curRights = ObjectsData[objIndex].rights[subIndex];
+    ObjectsData[objIndex].rights[subIndex] = "orwe".split("").filter(ch=> curRights.includes(ch) || right.includes(ch)).join("");
 
     console.log('addRight');
   }
 
-  const delRight = () =>{
+  const delRight = (pars) =>{
+    if(pars.length !== 4){
+      setError('Ошибка команды:  delRight <r,w,e> <Имя субъекта> <Имя объекта>')
+    }
+    let [right, subName, objName] = [pars[1], pars[2], pars[3]];
+    if(!right.match(/^r?w?e?$/)){
+      setError('Некорректные права доступа (rwe)');
+      return;
+    }
+    if(!UsersData.some(user=> user.username===subName)){
+      setError(`Пользователя "${subName}" не существует`);
+      return;
+    }
+    if(!ObjectsData.some(obj=> obj.name === objName)){
+      setError(`Объекта "${objName}" не существует`);
+      return;
+    }
+    let objIndex = ObjectsData.map(obj=>obj.name).indexOf(objName);
+    let curSubIndex = UsersData.map(usr=>usr.username).indexOf(username);
+    let subIndex = UsersData.map(usr=>usr.username).indexOf(subName);
+    if(!ObjectsData[objIndex].rights[curSubIndex].includes('o')){
+      setError(`Вы не можете изменять права на объект "${objName}" `);
+      return;
+    }
+
+    let curRights = ObjectsData[objIndex].rights[subIndex];
+    ObjectsData[objIndex].rights[subIndex] = "orwe".split("").filter(ch=> curRights.includes(ch) && !right.includes(ch)).join("");
     console.log('delRight');
   }
 
@@ -129,9 +173,6 @@ const HRUUserPanel = ({username, UsersData}) => {
   const ParseCommand = () =>{
     let pars = command.split(' ');
     switch (pars[0]){
-      case 'addSub':
-        addSub(pars);
-        break;
       case 'addObj':
         addObj(pars);
         break;
@@ -163,7 +204,7 @@ const HRUUserPanel = ({username, UsersData}) => {
   return(
     <React.Fragment>
       <div>
-        {objects.map((obj, i) => <ObjectButton key={i} objIndex={i} OpenModal={OpenModal} obj={obj} />)}
+        {ObjectsData.map((obj, i) => <ObjectButton key={i} objIndex={i} OpenModal={OpenModal} obj={obj} />)}
       </div>
       <InputGroup className="input_group">
         <InputGroup.Prepend>

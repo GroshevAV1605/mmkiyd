@@ -1,18 +1,17 @@
 import React, { useState } from "react";
-import { objects } from "../../constants/AMconstants";
 import { Table, Button, Modal, ButtonGroup } from "react-bootstrap";
 
-const AccessModel = ({ username, UsersData }) => {
+const AccessModel = ({ username, UsersData, ObjectsData }) => {
 
   return username==="admin" ? (
-    <AccessAdminPanel UsersData={UsersData}/>
+    <AccessAdminPanel UsersData={UsersData} ObjectsData={ObjectsData}/>
   ) : (
-    <AccessUserPanel username={username} UsersData={UsersData}/>
+    <AccessUserPanel username={username} UsersData={UsersData} ObjectsData={ObjectsData}/>
   );
 };
 
-const AccessAdminPanel = ({UsersData}) => {
-  const [rights, rightHandle] = useState(objects.map(el=>el.rights));
+const AccessAdminPanel = ({UsersData, ObjectsData}) => {
+  const [rights, rightHandle] = useState(ObjectsData.map(el=>el.rights));
 
   const rightsOnChange = e => {
     const x = e.target.parentElement.cellIndex - 1;
@@ -21,11 +20,11 @@ const AccessAdminPanel = ({UsersData}) => {
     const rightsCopy = rights.map(el => el.slice());
     const re = /^r?w?e?$/;
     if (value.match(re)) {
-      objects[y].rights[x] = value;
+      ObjectsData[y].rights[x] = value;
       rightsCopy[y][x] = value;
     }
     console.log(x + " " + y + ": " + value);
-    console.log(objects);
+    console.log(ObjectsData);
     rightHandle(rightsCopy);
   };
 
@@ -40,14 +39,14 @@ const AccessAdminPanel = ({UsersData}) => {
         </tr>
       </thead>
       <tbody>
-        {objects.map((el, i) => (
+        {ObjectsData.map((el, i) => (
           <tr key={i}>
             <td>{el.name}</td>
             {el.rights.map((right, j) => (
               <td key={j}>
                 <input
                   type="text"
-                  value={objects[i].rights[j]}
+                  value={ObjectsData[i].rights[j]}
                   onChange={rightsOnChange}
                 />
               </td>
@@ -59,15 +58,15 @@ const AccessAdminPanel = ({UsersData}) => {
   );
 };
 
-const AccessUserPanel = ({username, UsersData}) => {
+const AccessUserPanel = ({username, UsersData, ObjectsData}) => {
   const [show, setShow] = useState(false);
   const [displayData, displayDataHandler] = useState('')
   const users = UsersData.map(user => user.username).filter(user=>user!=="admin");
 
   const OpenModal = (objIndex, right) => {
     console.log(`index: ${objIndex}  /  right: ${right}`);
-    const deleg = objects[objIndex].rights[users.indexOf(username)].includes(right);
-    let dataString = `Пользователь "${username}" запрашивает разрешение на ${right==='r' ? 'чтение' : right === 'w' ? 'запись' : 'выполнение'} объекта "${objects[objIndex].name}".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
+    const deleg = ObjectsData[objIndex].rights[users.indexOf(username)].includes(right);
+    let dataString = `Пользователь "${username}" запрашивает разрешение на ${right==='r' ? 'чтение' : right === 'w' ? 'запись' : 'выполнение'} объекта "${ObjectsData[objIndex].name}".ДОСТУП ${deleg ? 'РАЗРЕШЕН': 'ЗАПРЕЩЕН'}!`
     displayDataHandler(dataString);
     setShow(true);
 
@@ -76,10 +75,10 @@ const AccessUserPanel = ({username, UsersData}) => {
   return(
     <React.Fragment>
       <div>
-        {objects.map((obj, i) => <ObjectButton key={i} objIndex={i} OpenModal={OpenModal} obj={obj} />)}
+        {ObjectsData.map((obj, i) => <ObjectButton key={i} objIndex={i} OpenModal={OpenModal} obj={obj} />)}
       </div>
       {/*<div>
-        {objects.map((obj, i) => <Button variant="secondary" size="lg" block key={i} onClick={buttonOnClick}>{obj.name}</Button>)}
+        {ObjectsData.map((obj, i) => <Button variant="secondary" size="lg" block key={i} onClick={buttonOnClick}>{obj.name}</Button>)}
 
       </div>*/}
       <Modal show={show} onHide={()=>setShow(false)}>
