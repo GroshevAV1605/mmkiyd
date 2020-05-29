@@ -23,23 +23,23 @@ export const data = [
 
 export let objects = [
   {
-    name: "объект №1",
+    name: "object1",
     rights: ["", "r", "", "we", ""]
   },
   {
-    name: "объект №2",
+    name: "object2",
     rights: ["e", "", "rw", "", "r"]
   },
   {
-    name: "объект №3",
+    name: "object3",
     rights: ["w", "rwe", "", "e", "re"]
   },
   {
-    name: "объект №4",
+    name: "object4",
     rights: ["rw", "e", "w", "", ""]
   },
   {
-    name: "объект №5",
+    name: "object5",
     rights: ["", "w", "", "rwe", ""]
   }
 ];

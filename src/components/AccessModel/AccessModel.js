@@ -92,6 +92,17 @@ const AccessUserPanel = ({username, UsersData, ObjectsData}) => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <Modal show={true} >
+        <Modal.Header closeButton>
+          <Modal.Title>Title</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Доступ на запись объекта "object4" разрешен. Права: "y" -> "c"</Modal.Body>
+        <Modal.Footer>
+          <Button onClick={()=>setShow(false)}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </React.Fragment>
   );
 };
@@ -108,7 +119,6 @@ const ObjectButton = ({obj, objIndex, OpenModal}) => {
       {showSub &&<ButtonGroup>
         <Button variant="primary" value="r" onClick={onBtnClick}>Read</Button>
         <Button variant="primary" value="w" onClick={onBtnClick}>Write</Button>
-        <Button variant="primary" value="e" onClick={onBtnClick}>Execute</Button>
       </ButtonGroup>}
     </div>
   )

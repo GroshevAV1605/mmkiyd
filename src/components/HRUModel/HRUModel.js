@@ -11,8 +11,9 @@ const HRUModel = ({ username, UsersData, ObjectsData, isLoginChange }) => {
 
 const HRUAdminPanel = ({UsersData, ObjectsData}) => {
   console.log(ObjectsData);
-  
+  //const asss = ['eco', 'dir', 'eco', 'sys', 'dir']
   return (
+    <div>
     <Table striped hover bordered>
       <thead>
         <tr>
@@ -28,11 +29,70 @@ const HRUAdminPanel = ({UsersData, ObjectsData}) => {
               <td key={j}>
                 {right}
               </td>
-            ))}
+            ))}           
           </tr>
         ))}
+        
       </tbody>
     </Table>
+    <Table striped hover bordered>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>C</th>
+          <th>E</th>
+          <th>R</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>объект№1</td>
+          <td>с</td>
+          <td>о</td>
+          <td>r,w</td>
+        </tr>
+        <tr>
+          <td>объект№2</td>
+          <td>э</td>
+          <td>с</td>
+          <td>r,w,e</td>
+        </tr>
+        <tr>
+          <td>объект№3</td>
+          <td>д</td>
+          <td>н</td>
+          <td>w</td>
+        </tr>
+        <tr>
+          <td>объект№4</td>
+          <td>с</td>
+          <td>н</td>
+          <td>е</td>
+        </tr>
+        <tr>
+          <td>объект№5</td>
+          <td>д</td>
+          <td>с</td>
+          <td>r</td>
+        </tr>
+        <tr>
+          <td>user1</td>
+          <td>д</td>
+          <td>с</td>
+        </tr>
+        <tr>
+          <td>user2</td>
+          <td>с</td>
+          <td>с</td>
+        </tr>
+        <tr>
+          <td>user3</td>
+          <td>э</td>
+          <td>н</td>
+        </tr>
+      </tbody>
+    </Table>
+    </div>
   )
 }
 
